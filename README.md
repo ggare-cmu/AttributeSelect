@@ -3,8 +3,9 @@
 **Distribution-Conditioned Attribute Selection (AttributeSelect) for Vision-Language Models**
 
 [![Paper](https://img.shields.io/badge/Paper-arXiv%3A2607.18695-red)](https://arxiv.org/abs/2607.18695)
+[![GitHub](https://img.shields.io/badge/GitHub-AttributeSelect-black?logo=github)](https://github.com/ggare-cmu/AttributeSelect)
 [![Website](https://img.shields.io/badge/Project-Page-blue)](https://ggare-cmu.github.io/AttributeSelect/)
-[![Venue](https://img.shields.io/badge/ECCV%20Workshops-2026-green)](https://eccv2026.eu/)
+[![Venue](https://img.shields.io/badge/ECCV%20Workshops-2026-green)](https://arxiv.org/abs/2607.18695)
 
 Gautam Rajendrakumar Gare, Jia Shi, Zhiqiu Lin, Deepak Pathak, John Galeotti, Deva Ramanan
 (Carnegie Mellon University)

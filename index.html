@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Attributes Should Come from Images, Not Class Names</title>
 <meta name="description" content="Distribution-Conditioned Attribute Selection for Vision-Language Models (AttributeSelect). ECCV 2026 Workshops.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
   :root {
     --text: #1c1e21; --muted: #5f6368; --accent: #1a73e8;
@@ -22,16 +23,21 @@
   h2 { font-size: 1.35em; margin-top: 2em; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
   h3 { font-size: 1.1em; margin-top: 1.5em; }
   .authors, .affil, .venue { text-align: center; margin: 0.35em 0; }
-  .authors a { color: var(--text); text-decoration: none; }
-  .authors a:hover { color: var(--accent); }
+  .authors a { color: #0000EE; font-weight: 600; text-decoration: none; }
+  .authors a:hover { text-decoration: underline; }
   .affil { color: var(--muted); }
-  .venue { font-weight: 600; color: var(--accent); }
+  .venue { font-weight: 600; }
+  .venue a { color: var(--accent); text-decoration: none; }
+  .venue a:hover { text-decoration: underline; }
   .buttons { text-align: center; margin: 1.4em 0 0.5em; }
   .btn {
-    display: inline-block; margin: 0 8px 8px 0; padding: 9px 22px; border-radius: 24px;
-    background: #222; color: #fff; text-decoration: none; font-weight: 600; font-size: 0.95em;
+    display: inline-flex; align-items: center; margin: 0 8px 8px 0; padding: 10px 22px;
+    border-radius: 30px; background: #363636; color: #fff; text-decoration: none;
+    font-weight: 600; font-size: 0.95em; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.1s ease, background-color 0.2s ease;
   }
-  .btn:hover { background: var(--accent); }
+  .btn:hover { background: #4a4a4a; transform: translateY(-2px); }
+  .btn i { margin-right: 8px; font-size: 1.1em; }
   figure { margin: 1.6em 0; text-align: center; }
   figure img { max-width: 100%; height: auto; border-radius: 4px; }
   figcaption { font-size: 0.88em; color: var(--muted); text-align: left; margin-top: 0.6em; }
@@ -72,11 +78,11 @@
     <a href="https://www.cs.cmu.edu/~deva/">Deva Ramanan</a>
   </p>
   <p class="affil">Carnegie Mellon University</p>
-  <p class="venue">ECCV 2026 Workshops</p>
+  <p class="venue"><a href="https://arxiv.org/abs/2607.18695">ECCV 2026 Workshops</a></p>
 
   <p class="buttons">
-    <a class="btn" href="https://arxiv.org/abs/2607.18695">&#128196; Paper</a>
-    <a class="btn" href="https://github.com/ggare-cmu/AttributeSelect">&#128187; Code</a>
+    <a class="btn" href="https://arxiv.org/abs/2607.18695"><i class="fas fa-file-pdf"></i> Paper</a>
+    <a class="btn" href="https://github.com/ggare-cmu/AttributeSelect" target="_blank"><i class="fab fa-github"></i> Code</a>
   </p>
 
   <figure>
