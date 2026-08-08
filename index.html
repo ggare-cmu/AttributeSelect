@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attributes Should Come from Images, Not Class Names</title>
+<meta name="description" content="Distribution-Conditioned Attribute Selection for Vision-Language Models (AttributeSelect). ECCV 2026 Workshops.">
+<style>
+  :root {
+    --text: #1c1e21; --muted: #5f6368; --accent: #1a73e8;
+    --rule: #e0e0e0; --box: #f6f8fa; --finding-frame: #269484; --finding-back: #e9f7f4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--text); background: #ffffff;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px; line-height: 1.6;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  h1 { font-size: 1.9em; line-height: 1.25; text-align: center; margin: 0.4em 0 0.2em; }
+  h1 .subtitle { display: block; font-size: 0.62em; font-weight: 500; color: var(--muted); margin-top: 0.4em; }
+  h2 { font-size: 1.35em; margin-top: 2em; border-bottom: 1px solid var(--rule); padding-bottom: 0.25em; }
+  h3 { font-size: 1.1em; margin-top: 1.5em; }
+  .authors, .affil, .venue { text-align: center; margin: 0.35em 0; }
+  .authors a { color: var(--text); text-decoration: none; }
+  .authors a:hover { color: var(--accent); }
+  .affil { color: var(--muted); }
+  .venue { font-weight: 600; color: var(--accent); }
+  .buttons { text-align: center; margin: 1.4em 0 0.5em; }
+  .btn {
+    display: inline-block; margin: 0 8px 8px 0; padding: 9px 22px; border-radius: 24px;
+    background: #222; color: #fff; text-decoration: none; font-weight: 600; font-size: 0.95em;
+  }
+  .btn:hover { background: var(--accent); }
+  figure { margin: 1.6em 0; text-align: center; }
+  figure img { max-width: 100%; height: auto; border-radius: 4px; }
+  figcaption { font-size: 0.88em; color: var(--muted); text-align: left; margin-top: 0.6em; }
+  figcaption b { color: var(--text); }
+  .finding {
+    border: 1.5px solid var(--finding-frame); background: var(--finding-back);
+    border-radius: 6px; padding: 12px 16px; margin: 1.4em 0; font-size: 0.97em;
+  }
+  table { border-collapse: collapse; margin: 1.2em auto; font-size: 0.92em; }
+  th, td { padding: 6px 14px; border-bottom: 1px solid var(--rule); text-align: center; }
+  th { border-bottom: 2px solid var(--text); }
+  td:first-child, th:first-child { text-align: left; }
+  tr.block-sep td { border-bottom: 2px solid var(--text); }
+  .tablewrap { overflow-x: auto; }
+  .tabnote { font-size: 0.88em; color: var(--muted); text-align: center; margin-top: -0.6em; }
+  pre {
+    background: var(--box); border: 1px solid var(--rule); border-radius: 6px;
+    padding: 14px 16px; overflow-x: auto; font-size: 0.85em; line-height: 1.45;
+  }
+  .hr { border: none; border-top: 1px solid var(--rule); margin: 2.2em 0; }
+  strong.win { color: var(--text); }
+  @media (max-width: 600px) { body { font-size: 15.5px; } h1 { font-size: 1.5em; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Attributes Should Come from Images, Not&nbsp;Class&nbsp;Names
+    <span class="subtitle">Distribution-Conditioned Attribute Selection for Vision-Language Models</span>
+  </h1>
+
+  <p class="authors">
+    <a href="https://ggare-cmu.github.io/">Gautam Rajendrakumar Gare</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.linkedin.com/in/elvishelvisshi/">Jia Shi</a> &nbsp;&middot;&nbsp;
+    <a href="https://linzhiqiu.github.io/">Zhiqiu Lin</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.cs.cmu.edu/~dpathak/">Deepak Pathak</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.ri.cmu.edu/ri-faculty/john-galeotti/">John Galeotti</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.cs.cmu.edu/~deva/">Deva Ramanan</a>
+  </p>
+  <p class="affil">Carnegie Mellon University</p>
+  <p class="venue">ECCV 2026 Workshops</p>
+
+  <p class="buttons">
+    <a class="btn" href="https://arxiv.org/abs/2607.18695">&#128196; Paper</a>
+    <a class="btn" href="https://github.com/ggare-cmu/AttributeSelect">&#128187; Code</a>
+  </p>
+
+  <figure>
+    <img src="static/images/teaser.png" alt="Teaser: LLM descriptors describe typical strawberries; image-conditioned attributes describe the sketch distribution.">
+    <figcaption><b>Class-name-conditioned descriptors fail under distribution shift; image-conditioned attributes track it.</b>
+    For <i>strawberry</i> on ImageNet-Sketch, an LLM prompted with the class name and an external knowledge base both
+    return descriptors of typical strawberries (red, ripe) because neither ever sees an image. AttributeSelect scores a large
+    attribute pool against the sketch images themselves and returns the attributes that actually hold in this
+    distribution (colorless, hand-drawn).</figcaption>
+  </figure>
+
+  <h2>Abstract</h2>
+  <p>
+    A popular route to interpretable zero-shot classification asks a large language model (LLM) to describe each class
+    name and prompts CLIP with the resulting descriptors. We show that these descriptors carry little visual evidence
+    of their own: removing the class name from the prompt collapses ImageNet accuracy from 59.5% to 15.5%. The
+    diagnosis is that the descriptors are conditioned on the label rather than on the images, so they describe the
+    concept in general and mislead exactly when the data shifts. We therefore select attributes from the target image
+    collection instead: we score a large attribute pool against the images in CLIP's joint embedding space and keep
+    the top-scoring attributes per class. Selected this way, class-name-free attribute prompts reach 23.8% on ImageNet
+    (against 15.5% for LLM descriptors), the gain holds on four shifted ImageNet variants, and reselecting from the
+    LLM's own pool isolates the selection mechanism as the cause. With one image per class, the selected attributes
+    outperform the prompt-tuning method CoOp by 3 points while fitting in under a minute instead of 14 hours. Because
+    the attribute set is chosen by the data, it doubles as a readable summary of a dataset, which we use to describe
+    distribution shift in words.
+  </p>
+
+  <hr class="hr">
+
+  <h2>The class-name confound</h2>
+  <p>
+    The standard descriptor protocol prompts CLIP with &ldquo;{class name}, which is {descriptor}&rdquo;. If the
+    descriptors measured attribute evidence in the image, they should retain accuracy when queried alone. They do
+    not: reduced to bare descriptors, accuracy collapses. Reselecting attributes from the <i>same pool</i> using
+    images recovers much of the loss, so the selection mechanism, not the vocabulary, is what makes attributes
+    informative.
+  </p>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>Prompt (no class name)</th><th>ImageNet</th><th>-V2</th><th>-Sketch</th><th>-A</th><th>-R</th></tr>
+    <tr><td>LLM descriptors (Menon &amp; Vondrick)</td><td>15.50</td><td>14.00</td><td>9.60</td><td>8.57</td><td>17.91</td></tr>
+    <tr><td>AttributeSelect, same descriptor pool (top 5)</td><td>19.40</td><td>17.00</td><td>10.57</td><td>9.80</td><td>19.49</td></tr>
+    <tr><td>AttributeSelect, VAW+LSA pool (top 5)</td><td><b>23.80</b></td><td><b>20.80</b></td><td><b>14.40</b></td><td><b>11.83</b></td><td><b>28.20</b></td></tr>
+  </table>
+  </div>
+  <p class="tabnote">Class-name-free zero-shot top-1 accuracy, CLIP-RN50; attributes selected on ImageNet only.
+  With the class name kept, the same LLM descriptors score 59.47 on ImageNet.</p>
+
+  <div class="finding"><b>Finding.</b> LLM-generated descriptors ride the class name: removing it from the prompt
+  collapses ImageNet accuracy from 59.5% to 15.5%. Their gains cannot be read as attribute-level evidence about the
+  image.</div>
+
+  <h2>Method: selecting attributes with images</h2>
+  <figure>
+    <img src="static/images/overview.png" alt="AttributeSelect pipeline overview">
+    <figcaption><b>Distribution-conditioned attribute selection.</b> A frozen CLIP encodes the target images and a
+    large pool of attribute texts; their cosine similarities form an attribute feature vector per image
+    (s<sub>j</sub> = 100 &middot; cos(v, t<sub>j</sub>)). Class-attribute scores come from the per-class mean of these
+    features or from a linear probe trained on them; each class keeps its top-k attributes as its prompt set. Both
+    encoders stay frozen; the only fitted object is the linear pairing, which fits in under a minute.</figcaption>
+  </figure>
+  <p>
+    Attributes are encoded bare, with no template and no class name, since a shared class name would correlate all of
+    a class's attribute scores: exactly the confound above. A test image is assigned to the class whose selected
+    attributes it matches best, optionally weighting each attribute's vote by its selection score.
+  </p>
+
+  <h2>Few-shot classification</h2>
+  <p>
+    Selection only has to rank a fixed pool of meaningful words, so one image per class carries enough signal: AttributeSelect
+    beats prompt tuning at 1&ndash;4 shots at a thousandth of the fitting cost, and the fitted object is a readable
+    word list rather than a soft prompt. Beyond 4 shots, gradient methods pass it; the probe only ranks the pool, so
+    extra images refine the ranking but add no capacity.
+  </p>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>Method</th><th>1-shot</th><th>2-shot</th><th>4-shot</th><th>8-shot</th><th>16-shot</th><th>Fit time</th></tr>
+    <tr><td>CLIP linear probe</td><td>24.46</td><td>35.09</td><td>44.60</td><td>52.31</td><td>57.10</td><td>&lt;1 min</td></tr>
+    <tr><td>CoOp</td><td>57.15</td><td>57.81</td><td>59.99</td><td>61.56</td><td><b>62.95</b></td><td>14 hr</td></tr>
+    <tr><td>WiSE-FT</td><td>58.30</td><td>59.08</td><td>60.48</td><td><b>61.85</b></td><td>62.84</td><td>&lt;1 min</td></tr>
+    <tr><td><b>AttributeSelect (ours)</b></td><td><b>60.13</b></td><td><b>60.92</b></td><td><b>61.13</b></td><td>61.39</td><td>61.35</td><td>&lt;1 min</td></tr>
+  </table>
+  </div>
+  <p class="tabnote">ImageNet top-1 accuracy, CLIP-RN50; zero-shot CLIP scores 55.31. Bold marks the best method per column.</p>
+
+  <div class="finding"><b>Finding.</b> With one image per class, image-conditioned attribute selection beats CoOp by
+  3 points (60.1 vs 57.2) at 10<sup>-3</sup> of the fitting cost, while producing a classifier that is a readable
+  list of words.</div>
+
+  <h2>Describing distribution shift in words</h2>
+  <p>
+    Because the attribute set is a function of an image collection, any collection can be summarized in words.
+    Subtracting the mean attribute profile of ImageNet from a shifted dataset's ranks the attributes that rose and
+    fell, using unlabeled images only. The description is actionable: turning the top domain attributes into prompt
+    templates (&ldquo;A cartoon photo of a {class}&rdquo;) improves zero-shot accuracy on the shifted variants by up
+    to 4 points.
+  </p>
+  <figure>
+    <img src="static/images/dist_shift.png" alt="Rising and falling attributes on ImageNet-Sketch and ImageNet-R">
+    <figcaption><b>Distribution shift, described in words.</b> Top rising and falling attributes of ImageNet-Sketch
+    (left) and ImageNet-R (right) relative to ImageNet. Sketch gains &ldquo;colorless&rdquo;, &ldquo;gray&rdquo;,
+    &ldquo;cartoon&rdquo; and loses color attributes; R gains &ldquo;cartoon&rdquo;, &ldquo;painting&rdquo;,
+    &ldquo;tattooed&rdquo;, matching its documented composition.</figcaption>
+  </figure>
+
+  <h2>Attribute-guided localization</h2>
+  <figure>
+    <img src="static/images/detection.png" alt="Attribute-guided localization heatmaps">
+    <figcaption><b>Class-name-free localization from selected attributes.</b> Removing CLIP-ResNet's attention pooling
+    preserves the spatial grid, so attribute similarities can be computed per patch. Querying with the hippopotamus
+    attribute set (left) and the Nile crocodile attribute set (right) localizes each animal; the queries contain no
+    class names.</figcaption>
+  </figure>
+
+  <h2>What the attribute features look like</h2>
+  <figure>
+    <img src="static/images/mutual_info.png" alt="Mutual information structure of CLIP vs attribute features">
+    <figcaption><b>Attribute features trade statistical independence for named, semantically clustered directions.</b>
+    Pairwise mutual information (viridis scale, dark = 0). CLIP dimensions (left) are near-independent; attribute
+    features (middle) are correlated, and a class's own top-5 attributes (right; park bench, chocolate syrup, hay)
+    share the most information. The transformation is a change of basis into named directions, not statistical
+    disentanglement.</figcaption>
+  </figure>
+
+  <h2>BibTeX</h2>
+  <pre>@inproceedings{gare2026attributes,
+  title     = {Attributes Should Come from Images, Not Class Names:
+               Distribution-Conditioned Attribute Selection for Vision-Language Models},
+  author    = {Gare, Gautam Rajendrakumar and Shi, Jia and Lin, Zhiqiu and
+               Pathak, Deepak and Galeotti, John and Ramanan, Deva},
+  booktitle = {ECCV Workshops},
+  year      = {2026}
+}</pre>
+
+  <hr class="hr">
+  <p style="color:var(--muted); font-size:0.85em; text-align:center;">
+    Page template inspired by <a href="https://ggare-cmu.github.io/DetPO/">DetPO</a> and academic project-page conventions.
+  </p>
+
+</div>
+</body>
+</html>
